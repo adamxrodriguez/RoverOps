@@ -1,0 +1,12 @@
+.git
+.tools
+.remote
+.vercel
+build*
+dashboard/node_modules
+dashboard/dist
+dashboard/test-results
+dashboard/playwright-report
+docs/screenshots
+*.log
+.env*

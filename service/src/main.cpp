@@ -17,14 +17,25 @@ int main(int argc, char** argv) {
     try {
         std::filesystem::path config_path{"config/rover.json"};
         int port_override = 0;
+        std::string host_override;
+        std::string public_url;
+        std::string static_root;
         for (int i = 1; i < argc; ++i) {
             const std::string_view arg{argv[i]};
             if (arg == "--help") {
-                std::cout << "Usage: roverops [--config config/rover.json] [--port 8080]\n";
+                std::cout << "Usage: roverops [--config config/rover.json] [--port 8080] "
+                             "[--host 127.0.0.1] [--public-url https://example.com] "
+                             "[--static-root dashboard/dist]\n";
                 return 0;
             }
             if (arg == "--config" && i + 1 < argc)
                 config_path = argv[++i];
+            else if (arg == "--host" && i + 1 < argc)
+                host_override = argv[++i];
+            else if (arg == "--public-url" && i + 1 < argc)
+                public_url = argv[++i];
+            else if (arg == "--static-root" && i + 1 < argc)
+                static_root = argv[++i];
             else if (arg == "--port" && i + 1 < argc) {
                 const std::string_view value{argv[++i]};
                 const auto [end, error] =
@@ -38,6 +49,14 @@ int main(int argc, char** argv) {
         auto config = roverops::load_config(config_path);
         if (port_override)
             config.port = port_override;
+        if (!host_override.empty())
+            config.host = host_override;
+        if (!static_root.empty())
+            config.static_root = static_root;
+        if (!public_url.empty()) {
+            config.public_demo = true;
+            config.allowed_origins = {public_url};
+        }
         config.validate();
         std::signal(SIGINT, signal_handler);
         std::signal(SIGTERM, signal_handler);

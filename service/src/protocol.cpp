@@ -1,6 +1,7 @@
 #include "roverops/protocol.hpp"
 #include <fstream>
 #include <map>
+#include <regex>
 #include <set>
 #include <stdexcept>
 
@@ -28,8 +29,17 @@ void read_int(const json& object, const char* key, int& value) {
 
 void AppConfig::validate() const {
     dynamics.validate();
-    if (host != "127.0.0.1")
-        throw std::invalid_argument("Phase 1 supports loopback host 127.0.0.1 only");
+    if (host != "127.0.0.1" && host != "0.0.0.0")
+        throw std::invalid_argument("host must be 127.0.0.1 or 0.0.0.0");
+    if (host == "0.0.0.0" && !public_demo)
+        throw std::invalid_argument("External binding requires explicit public_demo mode");
+    if (public_demo && allowed_origins.empty())
+        throw std::invalid_argument("Public demo requires an explicit allowed browser origin");
+    for (const auto& origin : allowed_origins) {
+        if (!std::regex_match(origin, std::regex(R"(^https?://[A-Za-z0-9.-]+(:[0-9]{1,5})?$)")))
+            throw std::invalid_argument(
+                "Allowed origins must be exact HTTP(S) origins without paths or wildcards");
+    }
     if (port < 1 || port > 65535)
         throw std::invalid_argument("port must be between 1 and 65535");
     if (tick_hz < 10 || tick_hz > 200)
@@ -50,13 +60,15 @@ AppConfig load_config(const std::filesystem::path& path) {
     if (input.contains("server")) {
         const auto& server = input.at("server");
         check_keys(server, {"host", "port", "tick_hz", "telemetry_hz", "max_websocket_clients",
-                            "allowed_origins"});
+                            "allowed_origins", "public_demo", "static_root"});
         config.host = server.value("host", config.host);
         read_int(server, "port", config.port);
         read_int(server, "tick_hz", config.tick_hz);
         read_int(server, "telemetry_hz", config.telemetry_hz);
         read_int(server, "max_websocket_clients", config.max_websocket_clients);
         config.allowed_origins = server.value("allowed_origins", config.allowed_origins);
+        config.public_demo = server.value("public_demo", config.public_demo);
+        config.static_root = server.value("static_root", config.static_root);
     }
     if (input.contains("dynamics")) {
         const auto& d = input.at("dynamics");

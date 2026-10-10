@@ -13,6 +13,8 @@ struct AppConfig {
     int tick_hz{50};
     int telemetry_hz{10};
     int max_websocket_clients{4};
+    bool public_demo{false};
+    std::string static_root;
     std::vector<std::string> allowed_origins{"http://127.0.0.1:5173", "http://localhost:5173"};
     void validate() const;
 };

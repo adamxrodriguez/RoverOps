@@ -21,6 +21,8 @@ ApiServer::ApiServer(Simulation& simulation, AppConfig config)
     : simulation_(simulation), config_(std::move(config)),
       server_(std::make_unique<httplib::Server>()) {
     config_.validate();
+    if (!config_.static_root.empty() && !server_->set_mount_point("/", config_.static_root))
+        throw std::invalid_argument("Cannot serve dashboard directory: " + config_.static_root);
     server_->set_payload_max_length(4096);
     server_->set_read_timeout(2);
     server_->set_write_timeout(1);
@@ -51,7 +53,8 @@ ApiServer::ApiServer(Simulation& simulation, AppConfig config)
                  {"world_limit_m", config_.dynamics.world_limit_m},
                  {"arrival_tolerance_m", config_.dynamics.arrival_tolerance_m},
                  {"tick_hz", config_.tick_hz},
-                 {"telemetry_hz", config_.telemetry_hz}});
+                 {"telemetry_hz", config_.telemetry_hz},
+                 {"public_demo", config_.public_demo}});
     });
     server_->Get("/api/state", [this](const auto&, auto& res) {
         respond(res, 200, telemetry_json(simulation_.snapshot()));

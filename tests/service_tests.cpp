@@ -40,6 +40,21 @@ TEST_CASE("telemetry has versioned SI-unit fields and explicit sensor provenance
     CHECK(state.at("sensors").at(0).at("source") == "simulated");
 }
 
+TEST_CASE("public deployment requires explicit mode and exact origins") {
+    AppConfig config;
+    config.host = "0.0.0.0";
+    CHECK_THROWS_AS(config.validate(), std::invalid_argument);
+    config.public_demo = true;
+    config.allowed_origins = {"https://rover.example.com"};
+    CHECK_NOTHROW(config.validate());
+    config.allowed_origins = {"*"};
+    CHECK_THROWS_AS(config.validate(), std::invalid_argument);
+    config.allowed_origins = {"https://rover.example.com/path"};
+    CHECK_THROWS_AS(config.validate(), std::invalid_argument);
+    config.allowed_origins.clear();
+    CHECK_THROWS_AS(config.validate(), std::invalid_argument);
+}
+
 TEST_CASE("simulation advances independently and snapshots remain owned copies") {
     Simulation simulation;
     const auto first = simulation.snapshot();

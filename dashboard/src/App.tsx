@@ -71,6 +71,11 @@ export default function App() {
         </div>
       </header>
 
+      {limits?.public_demo ? (
+        <p className="public-demo">
+          Public demo · One shared simulated rover. Commands affect all viewers.
+        </p>
+      ) : null}
       <div className="page-title">
         <div>
           <p className="eyebrow">LOCAL OPERATIONS</p>

@@ -8,7 +8,7 @@ acceleration and turning, consumes a simulated battery, and streams telemetry wh
 accepting commands. The implementation emphasizes inspectable ownership, explicit
 state transitions, short critical sections, and tests that exercise a real process.
 
-Phase 1 is a local software simulator. It is not a hardware controller, validated
+Phase 1 is a software simulator, runnable locally or as a shared public demo. It is not a hardware controller, validated
 robotics safety system, ROS 2 node, or physics engine.
 
 ![RoverOps dashboard connected to the running C++ simulator](docs/screenshots/dashboard.png)
@@ -62,6 +62,19 @@ No cloud accounts, API keys, database, ROS installation, or dependency download 
 needed for the C++ build. The build script finds a system CMake or `.tools/bin/cmake`.
 For a production frontend bundle, run `npm run build` followed by `npm run preview`
 in `dashboard/`; the local preview proxies the same API and WebSocket paths.
+
+## Deploy a public demo
+
+[Deploy to Render](https://render.com/deploy?repo=https://github.com/adamxrodriguez/RoverOps)
+using the included `render.yaml`. It selects a **Free** Docker web service: the
+C++ process serves the built dashboard, API, and WebSocket on one port. Render
+provides HTTPS. No database or paid subscription is needed for a small demo.
+Free services sleep after 15 minutes without inbound traffic and take about a
+minute to wake up; usage quotas apply. See [Render's free service limits](https://render.com/docs/free).
+
+The public demo has one shared rover, and every visitor can issue commands.
+State resets on restart or sleep. See [deployment instructions](docs/DEPLOYMENT.md)
+for Docker commands, settings, verification, and rollback.
 
 ## Architecture
 
@@ -150,10 +163,12 @@ Java/JavaScript comparison, lifetime diagrams in prose, and interview exercises.
 
 ## API
 
-The API binds only to `127.0.0.1`. Vite proxies `/api` and `/ws` from the dashboard,
+By default the API binds to `127.0.0.1`. Vite proxies `/api` and `/ws` from the dashboard,
 so no broad CORS policy is necessary. Browser origins must appear in
 `server.allowed_origins`; non-browser clients such as curl can omit Origin.
-This is a local tool without authentication or TLS. Origin checks are not authentication.
+The service has no authentication or built-in TLS. Origin checks are not authentication.
+External binding requires explicit public-demo mode and an exact allowed browser
+origin. Render terminates TLS in front of the container.
 
 | Method / path | Behavior |
 | --- | --- |
@@ -213,6 +228,9 @@ wrong types, non-finite values, and invalid ranges fail startup with an error.
 | Setting | Default | Accepted range / meaning |
 | --- | --- | --- |
 | `server.port` | 8080 | Integer 1–65535; CLI `--port` overrides |
+| `server.host` | 127.0.0.1 | `0.0.0.0` requires public-demo mode |
+| `server.public_demo` | false | Explicitly allows a shared, unauthenticated demo |
+| `server.static_root` | empty | Optional directory containing the built dashboard |
 | `server.tick_hz` | 50 | Integer 10–200 |
 | `server.telemetry_hz` | 10 | Integer 1–30, no greater than tick rate |
 | `server.max_websocket_clients` | 4 | Integer 1–8 |
@@ -267,7 +285,7 @@ BUILD_DIR=build-tsan ./scripts/build.sh -DROVEROPS_TSAN=ON
 
 Use `.clang-format` for first-party C++ and `.editorconfig` for general formatting.
 Do not format vendored headers. CI is provided in `.github/workflows/ci.yml`;
-its hosted run is only confirmed after pushing to GitHub. Local results are recorded
+[hosted results are on GitHub](https://github.com/adamxrodriguez/RoverOps/actions). Results are recorded
 in [verification](docs/VERIFICATION.md).
 
 ## Limitations and next steps

@@ -27,6 +27,7 @@ export type Telemetry = {
   errors: string[];
 };
 export type Limits = {
+  public_demo?: boolean;
   max_velocity_mps: number;
   world_limit_m: number;
   arrival_tolerance_m: number;

@@ -51,9 +51,12 @@ that initial launch delay was not established.
 
 ## Verification limits
 
-GitHub Actions is configured but has not run on GitHub; the repository has not been
-published. Linux CI, ThreadSanitizer, Windows, load testing, and physical hardware
-have not been verified locally. Sanitizer checks are evidence for these exercised
+The public repository is [adamxrodriguez/RoverOps](https://github.com/adamxrodriguez/RoverOps).
+The [initial hosted CI run](https://github.com/adamxrodriguez/RoverOps/actions/runs/38034125810)
+passed on October 10, 2026: GCC and Clang C++ tests, ASan/UBSan, API acceptance,
+frontend build, and Chromium browser tests on Ubuntu 24.04.
+ThreadSanitizer, Windows, load testing, and physical hardware
+have not been verified. Sanitizer checks are evidence for these exercised
 paths, not proof of the absence of all memory/concurrency errors.
 
 The simulated stop is immediate software state change. No actuator, physical

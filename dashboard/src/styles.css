@@ -12,6 +12,15 @@
   color-scheme: dark;
   font-size: 14px;
 }
+.public-demo {
+  padding: 12px 16px;
+  margin-top: 20px;
+  color: #e6bc80;
+  background: #302d23;
+  border: 1px solid #635536;
+  border-radius: 6px;
+  font-size: 12px;
+}
 * {
   box-sizing: border-box;
 }

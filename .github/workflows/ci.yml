@@ -50,3 +50,33 @@ jobs:
         with:
           name: browser-test-results
           path: dashboard/test-results/
+  container:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+      - name: Build production image and run C++ tests
+        run: docker build -t roverops:ci .
+      - name: Start the public demo container
+        run: |
+          docker run -d --name roverops -p 8080:8080 -e PUBLIC_ORIGIN=http://127.0.0.1:8080 roverops:ci
+          curl --fail --retry 15 --retry-delay 2 --retry-connrefused http://127.0.0.1:8080/api/health
+      - name: Install browser test dependencies
+        working-directory: dashboard
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Exercise the production container in Chromium
+        working-directory: dashboard
+        env:
+          ROVEROPS_BASE_URL: http://127.0.0.1:8080
+        run: npm run test:e2e
+      - name: Show container logs and stop
+        if: always()
+        run: |
+          docker logs roverops || true
+          docker stop roverops || true
