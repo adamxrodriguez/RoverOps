@@ -1,6 +1,29 @@
-# Phase 1 local verification
+# Phase 1 verification
 
 Verified October 9, 2026 (America/New_York) in the standalone RoverOps repository.
+
+## Public deployment — October 10, 2026
+
+- Public repository: [adamxrodriguez/RoverOps](https://github.com/adamxrodriguez/RoverOps).
+- Live service: [roverops.onrender.com](https://roverops.onrender.com), Render Free,
+  Docker, Virginia. The first successful deployment used commit `b13f503`.
+- [Production CI run](https://github.com/adamxrodriguez/RoverOps/actions/runs/38034382916):
+  GCC, Clang, ASan/UBSan, process/API tests, frontend build, browser acceptance, and
+  Docker image build plus container browser tests all passed.
+- Current C++ suite: **18 cases, 2,175 assertions passed**.
+- All three browser acceptance tests passed against the public HTTPS service:
+  the full operator mission, mobile/disconnected behavior, and forced WebSocket
+  closure followed by automatic reconnection. No page JavaScript errors occurred.
+- The live health endpoint returned `status: ok`; config confirmed public-demo mode;
+  an unapproved browser origin received HTTP 403.
+- Playwright MCP independently drove waypoint, velocity, start, pause, resume,
+  E-stop, and return-home controls on the public dashboard. It confirmed that pause
+  held position, E-stop disabled bypass controls, and the rover arrived home.
+  A missing favicon was found during inspection and fixed.
+
+The hosting is a shared demonstration, with four telemetry clients by default.
+Visitors control the same rover. The service sleeps when idle, takes time to wake,
+and resets state on restart. No paid plan or database was provisioned.
 
 ## Environment
 

@@ -2,6 +2,9 @@
 
 **A C++20 autonomous-rover simulator with a live React operator console.**
 
+[Open the live demo](https://roverops.onrender.com) ·
+[CI results](https://github.com/adamxrodriguez/RoverOps/actions)
+
 RoverOps demonstrates the boundary between robot state, concurrent execution,
 network transport, and operator controls. A rover follows waypoints with bounded
 acceleration and turning, consumes a simulated battery, and streams telemetry while
