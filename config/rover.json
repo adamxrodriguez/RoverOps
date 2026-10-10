@@ -1,0 +1,22 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8080,
+    "tick_hz": 50,
+    "telemetry_hz": 10,
+    "max_websocket_clients": 4,
+    "allowed_origins": ["http://127.0.0.1:5173", "http://localhost:5173"]
+  },
+  "dynamics": {
+    "max_velocity_mps": 3.0,
+    "initial_target_velocity_mps": 1.0,
+    "acceleration_mps2": 0.8,
+    "max_turn_rate_radps": 1.2,
+    "arrival_tolerance_m": 0.15,
+    "world_limit_m": 500.0,
+    "initial_battery_percent": 100.0,
+    "low_battery_percent": 20.0,
+    "idle_drain_percent_per_s": 0.002,
+    "motion_drain_percent_per_m": 0.006
+  }
+}

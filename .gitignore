@@ -1,0 +1,14 @@
+build*/
+.tools/
+dashboard/node_modules/
+dashboard/dist/
+dashboard/test-results/
+dashboard/playwright-report/
+.DS_Store
+*.log
+.env*
+!.env.example
+.cache/
+*.tsbuildinfo
+.vercel/
+.remote/

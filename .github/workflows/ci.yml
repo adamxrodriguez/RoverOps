@@ -1,0 +1,52 @@
+name: Build and verify
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+
+jobs:
+  cpp:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        compiler: [g++, clang++]
+    env:
+      CXX: ${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test C++20 with warnings as errors
+        run: ./scripts/build.sh
+  integration:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+      - name: Build instrumented C++ service and tests
+        env:
+          CXX: clang++
+        run: ./scripts/build.sh -DROVEROPS_SANITIZE=ON
+      - name: Install locked frontend dependencies
+        run: npm ci
+        working-directory: dashboard
+      - name: Type-check and build frontend
+        run: npm run build
+        working-directory: dashboard
+      - name: Test real REST and WebSocket service
+        run: npm run test:api
+        working-directory: dashboard
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+        working-directory: dashboard
+      - name: Browser acceptance tests
+        run: npm run test:e2e
+        working-directory: dashboard
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-test-results
+          path: dashboard/test-results/
