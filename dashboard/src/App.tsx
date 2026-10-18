@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { HowToUse } from './HowToUse';
 import { RoverMap } from './RoverMap';
 import { useTelemetry } from './useTelemetry';
 import type { Command } from './types';
@@ -71,11 +72,14 @@ export default function App() {
         </div>
       </header>
 
-      {limits?.public_demo ? (
-        <p className="public-demo">
-          Public demo · One shared simulated rover. Commands affect all viewers.
+      <div className="public-demo">
+        <p>
+          {limits?.public_demo
+            ? 'Public demo · One shared simulated rover. Commands affect all viewers.'
+            : 'Virtual rover simulator · Choose a destination and watch it move.'}
         </p>
-      ) : null}
+        <HowToUse />
+      </div>
       <div className="page-title">
         <div>
           <p className="eyebrow">LOCAL OPERATIONS</p>
