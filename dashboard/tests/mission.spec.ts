@@ -6,7 +6,7 @@ test('operator commands change the actual C++ rover and render live telemetry', 
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
-  await expect(page.getByText('Live telemetry', { exact: true })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: /^Live telemetry$/ })).toBeVisible();
   await page.getByLabel('X position', { exact: true }).fill('8');
   await page.getByLabel('Y position', { exact: true }).fill('5');
   await page.getByRole('button', { name: 'Set waypoint', exact: true }).click();
@@ -58,5 +58,5 @@ test('dashboard reconnects after a transport close and resumes telemetry', async
   });
   await page.goto('/');
   await expect.poll(() => connections).toBeGreaterThan(1);
-  await expect(page.getByText('Live telemetry', { exact: true })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: /^Live telemetry$/ })).toBeVisible();
 });
